@@ -1,5 +1,5 @@
 from datetime import timedelta                                                      #save this file within applications
-from flask import redirect, url_for                                                 #this file basically is here to separate all the routes into a different file
+from flask import redirect, url_for, render_template                                               #this file basically is here to separate all the routes into a different file
 from application import app, db                                                     #this is importing the app file and the db (the db is imported from the init file but that basically means that it is being imported from the application folder)
 from application.models import Project, Todo                                        #this is importing from the models file, the todo class (which is basically the definition of our table)
 from datetime import date, timedelta                                                #this is importing the time/date rules that we need
@@ -7,7 +7,8 @@ from datetime import date, timedelta                                            
 
 @app.route('/')                                                                         #this is the basic route of /
 def home():
-    return f"{Todo.query.count()} todos: " + '<br>'.join(str(t.project) + " ," + str(t) for t in Todo.query.all())    #this is bringing back all the queries for the "Todo" class but you can limit them too i.e. query.limit(5).all()) would bring back 5 
+    return render_template ('index.html')
+    #return f"{Todo.query.count()} todos: " + '<br>'.join(str(t.project) + " ," + str(t) for t in Todo.query.all())    #this is bringing back all the queries for the "Todo" class but you can limit them too i.e. query.limit(5).all()) would bring back 5 
                                                                                                 #the first part is counting the number of queries so this will show everything in the table. The str(t.project) bit is referring back to the project name
                                                                                                 #this string is joined by a line-break('<br>') for ever line in the todo class
 @app.route('/search=<keyword>')                                                 #this is an example that he couldn't finish 
