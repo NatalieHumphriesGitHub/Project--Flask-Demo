@@ -7,18 +7,25 @@ from datetime import date, timedelta                                            
 
 @app.route('/')                                                                         #this is the basic route of /
 def home():
-    return render_template ('index.html')
+    num_todos = Todo.query.count()
+    todos = [str(todo) + " " + str(todo.project) for todo in Todo.query.all()] #this is creating a variable which outlines a sentence string to be inserted
+    return render_template ('index.html', num = num_todos, todos = todos) #you have to always reference the file name first and then create a new variable that you want to add into html file - you can also do a calculation in the file.                                     
     #return f"{Todo.query.count()} todos: " + '<br>'.join(str(t.project) + " ," + str(t) for t in Todo.query.all())    #this is bringing back all the queries for the "Todo" class but you can limit them too i.e. query.limit(5).all()) would bring back 5 
                                                                                                 #the first part is counting the number of queries so this will show everything in the table. The str(t.project) bit is referring back to the project name
                                                                                                 #this string is joined by a line-break('<br>') for ever line in the todo class
-@app.route('/search=<keyword>')                                                 #this is an example that he couldn't finish 
+@app.route('/search=<keyword>')                                                 #this is a keyword example although you are not meant to use this way of doing things - not sure the correct way at the moment
 def search(keyword):
     data = db.session.execute(f"SELECT * FROM todo WHERE desc LIKE '%{keyword}%'")
-    return '<br>'.join([str(res) for res in data])
+    results = '<br>'.join([str(res) for res in data])
+    return render_template ('search.html', keyword = keyword, results = results)
+    
+    #return '<br>'.join([str(res) for res in data]) - this was the old return until we added the html files
 
 @app.route('/done')                                                                             #this route will now filter out all the done todos because of the below filter
-def done():                                                                                                     
-    return '<br>'.join(str(t) for t in Todo.query.filter_by(status = 'done').order_by(Todo.title.desc()).all())   #this will take us to a route where the filter is status = done, you can also add a couple of filters using a comma as a separator
+def done():        
+    tasks_done = '<br>'.join(str(t) for t in Todo.query.filter_by(status = 'done').order_by(Todo.title.desc()).all())                                                                                            
+    return render_template ('done.html', tasks_done = tasks_done)
+   #return '<br>'.join(str(t) for t in Todo.query.filter_by(status = 'done').order_by(Todo.title.desc()).all())   #this will take us to a route where the filter is status = done, you can also add a couple of filters using a comma as a separator
                                                                                             #this will order it by title - you need to put the class.attribute name and .desc gives it descending order           
                                                                                             # we are not allowed to return a query object in flask, so we need to loop it through to return the answer as a string - i.e. for t in Todo
 
